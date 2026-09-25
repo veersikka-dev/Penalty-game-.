@@ -1,0 +1,21 @@
+{
+  "name": "shard-zero",
+  "private": true,
+  "version": "1.0.0",
+  "description": "SHARD//ZERO — a first-person crystal-shattering arcade journey for the browser.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --open",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --open",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@types/three": "^0.186.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1"
+  }
+}
