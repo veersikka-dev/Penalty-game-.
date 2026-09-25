@@ -7,7 +7,7 @@ export function setErrorToast(fn: (msg: string) => void) {
 }
 
 export function reportError(context: string, err: unknown) {
-  console.error(`[SHARD//ZERO] ${context}:`, err);
+  console.error(`[OINK OPS] ${context}:`, err);
   const now = performance.now();
   if (toastFn && now - lastToast > 5000) {
     lastToast = now;
@@ -25,7 +25,7 @@ export function safely<T>(label: string, fn: () => T, fallback: T): T {
   try {
     return fn();
   } catch (err) {
-    console.warn(`[SHARD//ZERO] Optional feature "${label}" unavailable, continuing without it.`, err);
+    console.warn(`[OINK OPS] Optional feature "${label}" unavailable, continuing without it.`, err);
     return fallback;
   }
 }

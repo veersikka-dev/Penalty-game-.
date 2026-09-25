@@ -225,7 +225,7 @@ input[type='range']::-moz-range-thumb { width: 20px; height: 20px; border-radius
 .marker .gem { width: 30px; height: 30px; margin: 0 auto; background: var(--sun); border: 4px solid var(--ink); border-radius: 6px; transform: rotate(45deg); box-shadow: 0 3px 0 var(--ink); animation: bob 1s ease-in-out infinite; }
 @keyframes bob { 50% { margin-top: -6px; } }
 .marker .dist { font-family: var(--display); font-size: 14px; color: #fff; -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; margin-top: 6px; }
-.boss-bar { position: absolute; top: 18px; left: 50%; transform: translateX(-50%) translateY(-120px); width: min(600px, 60vw); text-align: center; transition: transform .5s var(--bounce); }
+.boss-bar { position: absolute; top: 18px; left: 50%; transform: translateX(-50%) translateY(-120px); width: min(520px, 44vw); text-align: center; transition: transform .5s var(--bounce); }
 .boss-bar.show { transform: translateX(-50%); }
 .boss-bar .nm { font-family: var(--display); font-size: 22px; color: #fff; -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill; }
 .boss-bar .tr { height: 26px; border: 5px solid var(--ink); border-radius: 14px; background: #fff; overflow: hidden; box-shadow: 0 5px 0 var(--ink); position: relative; }
@@ -244,7 +244,7 @@ input[type='range']::-moz-range-thumb { width: 20px; height: 20px; border-radius
 .popup.dmg { font-size: 16px; }
 .popup.coin { color: var(--sun); font-size: 18px; }
 @keyframes popup { 0% { opacity: 0; transform: translate(-50%, -20%) scale(0.5); } 15% { opacity: 1; transform: translate(-50%, -50%) scale(1.25); } 30% { transform: translate(-50%, -60%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -170%) scale(0.9); } }
-.hud-btns { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; pointer-events: auto; opacity: 0.8; }
+.hud-btns { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; pointer-events: auto; opacity: 0.75; }
 .vignette-hurt { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 55%, rgba(255, 40, 60, 0.55)); opacity: 0; transition: opacity .5s; }
 .aim-note { position: absolute; left: 50%; top: 58%; transform: translateX(-50%); font-weight: 700; color: #fff; text-shadow: 0 2px 0 var(--ink); opacity: 0; transition: opacity .3s; }
 .aim-note.show { opacity: 1; }

@@ -279,12 +279,15 @@ export class CollisionWorld {
   }
 
   /** True if the straight line a→b is blocked by solid geometry. */
-  blocked(a: THREE.Vector3, b: THREE.Vector3): boolean {
+  blocked(a: THREE.Vector3, b: THREE.Vector3, ignoreOwner?: unknown): boolean {
     const d = new THREE.Vector3().subVectors(b, a);
     const len = d.length();
     if (len < 1e-4) return false;
     d.divideScalar(len);
     const hit = this.raycast(a, d, len - 0.05, false);
-    return !!hit;
+    if (!hit) return false;
+    // a target's own collider doesn't block the view of it
+    if (ignoreOwner && (hit.box?.owner === ignoreOwner || hit.cyl?.owner === ignoreOwner)) return false;
+    return true;
   }
 }

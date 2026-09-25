@@ -183,7 +183,6 @@ export class LevelDirector {
       case 'boss':
         if (!this.bossStarted && dist < 30) {
           this.bossStarted = true;
-          this.markerActive = false;
           this.hooks.startBoss();
         }
         if (this.bossStarted && this.hooks.bossDefeated()) this.complete();

@@ -198,7 +198,7 @@ export class Combat {
         if (dist > max || dist < 2) continue;
         const ang = _v.divideScalar(dist).angleTo(camDir);
         const angAdj = ang - (s.type === 'sphere' ? Math.atan(s.r / dist) : 0) * 0.5;
-        if (angAdj < bestAng && !this.world.blocked(camPos, s.c)) {
+        if (angAdj < bestAng && !this.world.blocked(camPos, s.c, t)) {
           bestAng = angAdj;
           assistTo = s.c;
         }
@@ -209,7 +209,7 @@ export class Combat {
       dir.lerp(_v, 0.35).normalize();
     }
     const wh = this.world.raycast(camPos, dir, max, true);
-    const th = this.raycastTargets(camPos, dir, wh ? wh.dist : max);
+    const th = this.raycastTargets(camPos, dir, wh ? wh.dist + 0.6 : max);
     if (th) return { point: th.point, target: th.target, weak: !!th.shape.weak, dist: th.dist, dir };
     const dist = wh ? wh.dist : max;
     return { point: camPos.clone().addScaledVector(dir, dist), target: null, weak: false, dist, dir };
@@ -220,7 +220,7 @@ export class Combat {
   /** Instant-hit shot (Bacon Blaster). Returns what it hit. */
   hitscan(from: THREE.Vector3, dir: THREE.Vector3, def: WeaponDef, damageMult: number, tracerColor: number): { point: THREE.Vector3; hit: Damageable | null; weak: boolean } {
     const wh = this.world.raycast(from, dir, def.range, true);
-    const maxD = wh ? wh.dist : def.range;
+    const maxD = wh ? wh.dist + 0.6 : def.range;
     const th = this.raycastTargets(from, dir, maxD);
     const end = th ? th.point : wh ? wh.point : from.clone().addScaledVector(dir, def.range);
     this.vfx.tracer(from, end, tracerColor, 0.04, 0.07);
@@ -285,7 +285,7 @@ export class Combat {
       if (d > def.range + 1) continue;
       _v2.copy(_v).setY(0).normalize();
       if (_v2.dot(_dir.copy(dir).setY(0).normalize()) < cosHalf && d > 1.8) continue;
-      if (this.world.blocked(from, t.shapes[0]?.c ?? t.position)) continue;
+      if (this.world.blocked(from, t.shapes[0]?.c ?? t.position, t)) continue;
       const falloff = 1 - Math.min(1, d / (def.range + 1)) * 0.5;
       this.applyHit(t, { amount: def.damage * damageMult * falloff, point: t.shapes[0]?.c.clone() ?? t.position.clone(), dir: _v2.clone(), knockback: def.knockback * falloff, weak: false, source: 'player', weapon: def.id, shape: t.shapes[0] });
     }
@@ -367,7 +367,7 @@ export class Combat {
         seg.divideScalar(segLen);
         const wh = this.world.raycast(prev, seg, segLen + p.radius, true);
         if (p.team === 'player') {
-          const th = this.raycastTargets(prev, seg, (wh ? wh.dist : segLen) + p.radius);
+          const th = this.raycastTargets(prev, seg, (wh ? wh.dist + 0.4 : segLen) + p.radius);
           if (th) {
             done = this.projectileHit(p, th.target, th.shape, th.point);
           } else if (wh) {

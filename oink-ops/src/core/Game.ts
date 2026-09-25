@@ -113,6 +113,7 @@ export class Game implements MenuActions {
   private levelTime = 0;
   private pausedAt = 0;
   private musicBase = 0.35;
+  private armorHintT = -10;
   private fps = { acc: 0, n: 0, win: 0 };
   simSteps = 1;
   frameErrors = 0;
@@ -474,7 +475,7 @@ export class Game implements MenuActions {
     }
     if (data.exit) this.portal = this.buildPortal(data.exit.x, data.exit.z);
     if (data.bossArena) {
-      this.boss = new BaconBoss(new THREE.Vector3(data.bossArena.x, 0.5, data.bossArena.z), this.world, this.scene);
+      this.boss = new BaconBoss(new THREE.Vector3(data.bossArena.x, 0.4, data.bossArena.z), this.world, this.scene);
       this.boss.tiles = data.arenaTiles.map((t) => ({ box: t.box, mesh: t.mesh, falling: -1, gone: false }));
     }
     this.director.load(data.objectives, data.encounters);
@@ -823,6 +824,12 @@ export class Game implements MenuActions {
         this.vfx.hit(info.point, crit ? 0xffe040 : 0xffffff, crit);
         this.audio.enemyHit(this.pan(info.point.x), crit);
         if (dealt > 0.5) this.popupAt(info.point, crit ? `${Math.round(dealt)}!` : String(Math.round(dealt)), crit ? 'crit' : 'dmg');
+        // armoured boss phases: tell the player where to aim
+        if (t.kind === 'boss' && this.boss && (this.boss.phase === 'p2' || this.boss.phase === 'p3') && info.shape?.id === undefined && this.time - this.armorHintT > 2.5) {
+          this.armorHintT = this.time;
+          this.popupAt(info.point, this.boss.phase === 'p2' ? 'SHOOT THE PLATES!' : 'HIT THE GLOWING CORES!', 'big');
+          this.audio.clank(this.pan(info.point.x));
+        }
         if (crit) this.hitStop(0.035);
       } else if (t.kind === 'prop' && info.source === 'player') {
         this.vfx.impact(info.point, info.dir.clone().negate(), 0xffe0b0, 0.8);
@@ -1103,9 +1110,13 @@ export class Game implements MenuActions {
     p.model.root.rotation.y = lookYaw;
     p.anim.update({ dt, time: t, speed: 0, sprint: false, grounded: true, vy: 0, aim: 0, crouch: false, aimPitch: 0, aimYaw: 0, strafe: 0 });
     this.weapons.model.update(dt, t);
-    const orbit = this.customizing ? { r: 3.4, h: 1.5, a: 0.6 } : { r: 7.5, h: 2.6, a: 0.9 + Math.sin(t * 0.08) * 0.25 };
-    const camPos = new THREE.Vector3(Math.sin(orbit.a) * orbit.r - (this.customizing ? 1.2 : -2.8), orbit.h, Math.cos(orbit.a) * orbit.r);
-    this.cam.cinematic = { pos: camPos, look: new THREE.Vector3(this.customizing ? -1.1 : 2.4, this.customizing ? 1.1 : 1.6, 0), fov: this.customizing ? 45 : 55 };
+    if (this.customizing) {
+      // Trotter stands on the left third of the screen, the shop panel fills the right
+      this.cam.cinematic = { pos: new THREE.Vector3(1.7, 1.5, 4.8), look: new THREE.Vector3(1.55, 1.1, 0), fov: 44 };
+    } else {
+      const a = 0.9 + Math.sin(t * 0.08) * 0.25;
+      this.cam.cinematic = { pos: new THREE.Vector3(Math.sin(a) * 7.5 + 2.8, 2.6, Math.cos(a) * 7.5), look: new THREE.Vector3(2.4, 1.6, 0), fov: 55 };
+    }
     this.cam.update(dt, t, p.pos, { aim: false, sprint: false, grounded: true, vy: 0, scale: 1 }, this.world);
     for (const a of this.level?.animators ?? []) a(t, dt);
     this.sky?.update(t, this.cam.camera.position);

@@ -98,7 +98,7 @@ export class BaconBoss implements Damageable {
     this.group.position.copy(center);
     this.build();
     scene.add(this.group);
-    this.collider = world.addCyl(center.x, center.z, 4.2, center.y, center.y + 9, { owner: this });
+    this.collider = world.addCyl(center.x, center.z, 4.2, center.y, center.y + 9, { owner: this, solid: false });
     this.group.traverse((o) => {
       if ((o as THREE.Mesh).isMesh && o.name !== 'outline') o.castShadow = true;
     });

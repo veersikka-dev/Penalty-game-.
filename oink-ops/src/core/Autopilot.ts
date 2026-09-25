@@ -42,9 +42,9 @@ export class Autopilot {
       const eye = _v.copy(p).setY(p.y + 1.3);
       const consider = (t: Damageable, maxD: number, bias = 0) => {
         if (!t.alive || !t.shapes.length) return;
-        const s = t.shapes.find((sh) => sh.weak) ?? t.shapes[0];
+        const s = t.shapes.find((sh) => sh.weak) ?? t.shapes.find((sh) => sh.id !== undefined) ?? t.shapes[0];
         const d = s.c.distanceTo(p) + bias;
-        if (d < maxD && d < best && !g.world.blocked(eye, s.c)) {
+        if (d < maxD && d < best && !g.world.blocked(eye, s.c, t)) {
           best = d;
           this.target = t;
         }
@@ -56,8 +56,9 @@ export class Autopilot {
       for (const pr of g.props.list) if (pr.type === 'crackedWall') consider(pr, 12, 8);
     }
     // ---- aim & fire
+    if (this.target && !this.target.shapes.length) this.target = null;
     if (this.target) {
-      const s = this.target.shapes.find((sh) => sh.weak && (this.target!.kind !== 'boss' || true)) ?? this.target.shapes[0];
+      const s = this.target.shapes.find((sh) => sh.weak) ?? this.target.shapes.find((sh) => sh.id !== undefined) ?? this.target.shapes[0];
       const camPos = g.cam.camera.position;
       _v.subVectors(s.c, camPos).normalize();
       const yaw = Math.atan2(_v.x, _v.z);
@@ -111,6 +112,10 @@ export class Autopilot {
         // low obstacle: jump over it
         if (a === 0 && hit.box && hit.box.max.y - p.y < 1.3) c.jump = true;
       }
+      // don't walk into pits: wait at the edge until something solid (a moving platform) is ahead
+      const ahead = new THREE.Vector3(p.x + chosen.x * 1.3, 0, p.z + chosen.z * 1.3);
+      const gnd = g.world.groundAt(ahead.x, ahead.z, p.y + 0.45).y;
+      if (!Number.isFinite(gnd) || gnd < p.y - 3) chosen.set(0, 0, 0);
       const yaw = g.cam.yaw;
       const fwd = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
       const right = new THREE.Vector3(-Math.cos(yaw), 0, Math.sin(yaw));

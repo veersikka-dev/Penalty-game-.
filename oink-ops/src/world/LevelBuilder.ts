@@ -166,6 +166,23 @@ export class LevelBuilder {
   /** A walkable block with a toon look. */
   platform(x: number, z: number, w: number, d: number, h: number, color: number, top?: number, y0 = 0) {
     this.add(this.rbox(w, h, d, Math.min(0.25, h / 3)), color, [x, y0 + h / 2, z]);
+    // Detail tall faces so walls never read as flat slabs: a trim band and pilasters
+    if (h >= 1.8 && Math.max(w, d) >= 3) {
+      const trim = new THREE.Color(color).multiplyScalar(0.82).getHex();
+      this.add(this.rbox(w + 0.14, 0.28, d + 0.14, 0.1), trim, [x, y0 + h * 0.35, z], [0, 0, 0], [1, 1, 1], 0.025);
+      this.add(this.rbox(w + 0.1, 0.18, d + 0.1, 0.06), trim, [x, y0 + 0.09, z], [0, 0, 0], [1, 1, 1], 0);
+      const long = w >= d ? 'x' : 'z';
+      const len = long === 'x' ? w : d;
+      const n = Math.max(1, Math.floor(len / 4));
+      for (let i = 0; i <= n; i++) {
+        const t = -len / 2 + (i / n) * len;
+        for (const s of [-1, 1]) {
+          const px = long === 'x' ? x + t * 0.96 : x + s * (w / 2 + 0.06);
+          const pz = long === 'x' ? z + s * (d / 2 + 0.06) : z + t * 0.96;
+          this.add(this.rbox(long === 'x' ? 0.5 : 0.22, h * 0.9, long === 'x' ? 0.22 : 0.5, 0.08), trim, [px, y0 + h * 0.45, pz], [0, 0, 0], [1, 1, 1], 0.02);
+        }
+      }
+    }
     if (top !== undefined) this.add(this.rbox(w + 0.1, 0.22, d + 0.1, 0.1), top, [x, y0 + h - 0.05, z], [0, 0, 0], [1, 1, 1], 0.03);
     return this.solid(x, y0, z, w, h, d);
   }
